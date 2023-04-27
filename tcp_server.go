@@ -5,7 +5,11 @@ import (
 	"log"
 	"net"
 	"sync"
+        "strconv"
+	"strings"
+	"fmt"
 	"github.com/mafl97/is105sem03/mycrypt"
+	"github.com/mafl97/funtemps/conv"
 )
 
 func main() {
@@ -37,15 +41,28 @@ func main() {
 						}
 						return // fra for løkke
 					}
-<<<<<<< HEAD
+
 					krypterMelding := mycrypt.Krypter([]rune(string(buf[:n])), mycrypt.ALF_SEM03, len(mycrypt.ALF_SEM03)-4)
-=======
->>>>>>> 3cc1bc5db609b4e595d875db6ae626da4f44f858
 					dekryptertMelding := mycrypt.Krypter([]rune(string(buf[:n])), mycrypt.ALF_SEM03, len(mycrypt.ALF_SEM03)-4)
 					log.Println("Dekrypter melding: ", string(dekryptertMelding))
 					switch msg := string(dekryptertMelding); msg {
   				        case "ping":
 						_, err = c.Write([]byte("pong"))
+					  case "Kjevik":
+						fields := strings.Split(msg, ";")
+						lastField := fields[len(fields)-1]
+						celsius, err := strconv.ParseFloat(lastField, 64)
+						if err != nil {
+							log.Println(err)
+							continue
+						}
+						fahrenheit := conv.CelsiusToFarhenheit(celsius)
+						if err != nil {
+							log.Println(err)
+							continue
+						}
+						msg := fmt.Sprintf("%.2f", fahrenheit)
+						_, err = c.Write([]byte(msg))
 					default:
 						_, err = c.Write([]byte(string(krypterMelding)))
 					}
@@ -53,7 +70,7 @@ func main() {
 						if err != io.EOF {
 							log.Println(err)
 						}
-						return // fra for løkke
+						return // fra for l  kke
 					}
 				}
 			}(conn)
